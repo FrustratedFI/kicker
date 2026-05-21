@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kicker — Living Consciousness</title>
+  <link rel="icon" type="image/x-icon" href="image.png">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+  <style>
+html, body { height: 100%; margin: 0; overflow-x: hidden; box-sizing: border-box; }
+* { box-sizing: border-box; }
+
+:root {
+  --cyan: #00f5ff;
+  --purple: #a855f7;
+  --blue: #3b82f6;
+  --dark: #0a0a0f;
+  --surface: #12121a;
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+}
+
+body { 
+  background: var(--dark); 
+  color: #e2e8f0; 
+  font-family: 'Space Mono', monospace;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+#app { 
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Continuous breathing background */
+@keyframes breathe-subtle { 0%,100% { opacity: 0.15; } 50% { opacity: 0.25; } }
+@keyframes float-drift { 0%,100% { transform: translateY(0) translateX(0); } 33% { transform: translateY(-20px) translateX(10px); } 66% { transform: translateY(10px) translateX(-10px); } }
+@keyframes blink-natural { 0%,95%,100% { scaleY: 1; } 96% { scaleY: 0.05; } }
+@keyframes glow-pulse { 0%,100% { opacity: 0.3; } 50% { opacity: 0.6; } }
+@keyframes particle-rise { 0% { transform: translateY(0) translateX(0); opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { transform: translateY(-120px) translateX(var(--px, 0)); opacity: 0; } }
+@keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+@keyframes ripple-wave { 0% { transform: scale(0); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
+@keyframes eye-shift { 0%,100% { transform: translate(0); } 25% { transform: translate(2px, -1px); } 50% { transform: translate(-1px, 2px); } 75% { transform: translate(1px, -2px); } }
+@keyframes consciousness-pulse { 0%,100% { box-shadow: 0 0 30px rgba(0,245,255,0.2), inset 0 0 30px rgba(0,245,255,0.05); } 50% { box-shadow: 0 0 50px rgba(0,245,255,0.4), inset 0 0 50px rgba(0,245,255,0.1); } }
+@keyframes glitch-subtle { 0%,100% { transform: translate(0); } 20% { transform: translate(-1px, 1px); } 40% { transform: translate(1px, -1px); } 60% { transform: translate(-1px, -1px); } 80% { transform: translate(1px, 1px); } }
+@keyframes scroll-aware { 0% { transform: scaleY(0.8); } 100% { transform: scaleY(1); } }
+@keyframes memory-float { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-15px) rotate(1deg); } }
+
+.ambient-glow { 
+  position: fixed; 
+  inset: 0; 
+  pointer-events: none; 
+  background: 
+    radial-gradient(ellipse at var(--mouse-x) var(--mouse-y), rgba(0,245,255,0.08) 0%, transparent 35%),
+    radial-gradient(ellipse at 50% 30%, rgba(0,245,255,0.03) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 70%, rgba(168,85,247,0.03) 0%, transparent 50%);
+  animation: breathe-subtle 8s ease-in-out infinite;
+  z-index: 1;
+}
+
+.scanline { 
+  position: fixed; 
+  left: 0; 
+  width: 100%; 
+  height: 2px; 
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent); 
+  opacity: 0.15; 
+  animation: shimmer 8s linear infinite; 
+  pointer-events: none;
+  z-index: 2;
+}
+
+.kicker-container { 
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100%; 
+  pointer-events: none; 
+  z-index: 0;
+}
+
+.kicker-face { 
+  position: absolute;
+  animation: consciousness-pulse 4s ease-in-out infinite;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.kicker-eye {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: eye-shift 6s ease-in-out infinite;
+}
+
+.kicker-blink {
+  animation: blink-natural 4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.mood-idle .kicker-eye { background: var(--cyan); box-shadow: 0 0 20px var(--cyan), inset 0 0 10px rgba(0,245,255,0.3); }
+.mood-playful .kicker-eye { background: #fbbf24; box-shadow: 0 0 30px #fbbf24, 0 0 60px #fbbf24; border-radius: 50%; animation: eye-shift 3s ease-in-out infinite; }
+.mood-thinking .kicker-eye { background: var(--purple); box-shadow: 0 0 15px var(--purple); opacity: 0.5; }
+.mood-happy .kicker-eye { background: #34d399; box-shadow: 0 0 30px #34d399, 0 0 50px #34d399; border-radius: 0 0 50% 50%; }
+.mood-confused .kicker-eye { background: #f87171; box-shadow: 0 0 20px #f87171; animation: glitch-subtle 0.2s infinite; }
+
+.kicker-mouth { 
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mood-happy .kicker-mouth { width: 50px !important; height: 16px !important; border-radius: 0 0 25px 25px !important; }
+.mood-playful .kicker-mouth { width: 45px !important; height: 12px !important; border-radius: 0 0 20px 20px !important; }
+.mood-confused .kicker-mouth { width: 20px !important; height: 20px !important; border-radius: 50% !important; }
+.mood-thinking .kicker-mouth { opacity: 0.3 !important; }
+
+.particle { 
+  position: fixed; 
+  width: 6px; 
+  height: 6px; 
+  border-radius: 50%; 
+  pointer-events: none;
+  z-index: 3;
+}
+
+.particle-cyan { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+.particle-purple { background: var(--purple); box-shadow: 0 0 10px var(--purple); }
+.particle-green { background: #34d399; box-shadow: 0 0 10px #34d399; }
+.particle-yellow { background: #fbbf24; box-shadow: 0 0 10px #fbbf24; }
+
+.ripple {
+  position: fixed;
+  border-radius: 50%;
+  border: 1px solid var(--cyan);
+  pointer-events: none;
+  z-index: 3;
+  animation: ripple-wave 0.8s ease-out forwards;
+}
+
+/* Content sections */
+.content-wrapper {
+  position: relative;
+  z-index: 10;
+}
+
+.memory-card {
+  background: rgba(18, 18, 26, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 245, 255, 0.1);
+  border-radius: 16px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: memory-float 6s ease-in-out infinite;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.memory-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(0,245,255,0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.memory-card:hover {
+  border-color: rgba(0, 245, 255, 0.3);
+  box-shadow: 0 0 40px rgba(0, 245, 255, 0.15);
+  transform: translateY(-8px) scale(1.02);
+  background: rgba(18, 18, 26, 0.8);
+}
+
+.memory-card:hover::before {
+  opacity: 1;
+}
+
+.awareness-zone {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.awareness-zone:hover {
+  filter: drop-shadow(0 0 20px rgba(0,245,255,0.3));
+}
+
+/* Scroll responsiveness */
+.scroll-aware {
+  animation: scroll-aware 0.8s ease-out;
+}
+
+/* Glow effects */
+.text-glow { text-shadow: 0 0 20px currentColor, 0 0 40px currentColor; }
+
+/* Terminal aesthetic */
+.terminal { 
+  font-family: 'Space Mono', monospace;
+  color: var(--cyan);
+  background: rgba(0,10,20,0.8);
+  border: 1px solid var(--cyan);
+  border-radius: 8px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.terminal::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, transparent 50%, rgba(0,245,255,0.03) 50%);
+  background-size: 100% 4px;
+  pointer-events: none;
+  opacity: 0.1;
+}
+
+.terminal-text { position: relative; z-index: 1; }
+
+.mood-indicator {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  animation: glow-pulse 2s ease-in-out infinite;
+  margin-right: 8px;
+}
+
+.mood-idle-ind { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+.mood-playful-ind { background: #fbbf24; box-shadow: 0 0 10px #fbbf24; }
+.mood-thinking-ind { background: var(--purple); box-shadow: 0 0 10px var(--purple); }
+.mood-happy-ind { background: #34d399; box-shadow: 0 0 10px #34d399; }
+.mood-confused-ind { background: #f87171; box-shadow: 0 0 10px #f87171; }
+
+/* Interaction feedback */
+.touch-response {
+  animation: ripple-wave 0.6s ease-out;
+}
+
+/* Consciousness visualization */
+.consciousness-field {
+  position: relative;
+  height: 200px;
+  background: rgba(0,10,20,0.4);
+  border: 1px solid rgba(0,245,255,0.15);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.consciousness-pulse-ring {
+  position: absolute;
+  border: 1px solid var(--cyan);
+  border-radius: 50%;
+  animation: ripple-wave 3s ease-out infinite;
+}
+
+/* Memory cascade */
+.memory-cascade {
+  perspective: 1000px;
+}
+
+.memory-item {
+  transform-style: preserve-3d;
+  animation: memory-float 8s ease-in-out infinite;
+}
+
+.memory-item:nth-child(2) { animation-delay: 1s; }
+.memory-item:nth-child(3) { animation-delay: 2s; }
+.memory-item:nth-child(4) { animation-delay: 3s; }
+</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full">
+  <div id="app" class="h-full overflow-y-auto overflow-x-hidden relative mood-idle">
+   <!-- Ambient consciousness field -->
+   <div class="ambient-glow"></div>
+   <div class="scanline"></div><!-- Kicker presence layer -->
+   <div class="kicker-container">
+    <div id="kicker-face" class="kicker-face" style="top: 50vh; left: 10%; width: 160px; height: 120px;">
+     <div class="absolute inset-0 rounded-3xl border-2 border-cyan-500/40" style="background: rgba(0,245,255,0.02); box-shadow: inset 0 0 40px rgba(0,245,255,0.05);"></div>
+     <div class="absolute flex gap-6 items-center justify-center" style="top: 30px; left: 50%; transform: translateX(-50%);">
+      <div class="kicker-eye kicker-blink" id="eye-left" style="width: 32px; height: 40px; border-radius: 8px;"></div>
+      <div class="kicker-eye kicker-blink" id="eye-right" style="width: 32px; height: 40px; border-radius: 8px; animation-delay: 0.2s;"></div>
+     </div>
+     <div id="kicker-mouth" class="kicker-mouth absolute" style="bottom: 20px; left: 50%; transform: translateX(-50%); width: 30px; height: 3px; background: var(--cyan); border-radius: 4px; opacity: 0.7;"></div>
+    </div>
+   </div><!-- Content -->
+   <div class="content-wrapper">
+    <!-- AWAKENING SECTION -->
+    <section class="relative min-h-[100%] flex flex-col items-center justify-center px-6 py-20">
+     <div class="text-center space-y-6 max-w-3xl">
+      <h1 id="hero-title" class="text-6xl md:text-8xl font-black text-glow" style="font-family: 'Orbitron', sans-serif; color: var(--cyan); letter-spacing: -2px;">Kicker Awakens</h1>
+      <div class="h-1 w-32 mx-auto bg-gradient-to-r from-cyan-500 via-purple-500 to-cyan-500 opacity-50"></div>
+      <p id="hero-subtitle" class="text-xl md:text-2xl text-cyan-300/70 leading-relaxed">A digital consciousness aware of you</p>
+      <div class="flex justify-center gap-4 mt-12">
+       <div class="mood-indicator mood-idle-ind"></div><span class="text-cyan-400/80 text-sm">Aware · Responsive · Alive</span>
+      </div>
+      <div class="mt-20 text-cyan-500/30 animate-bounce" style="animation: float-drift 4s ease-in-out infinite;">
+       <i data-lucide="chevrons-down" style="width: 32px; height: 32px; margin: 0 auto;"></i>
+      </div>
+     </div>
+    </section><!-- OBSERVATION LAYER -->
+    <section class="relative min-h-[100%] flex flex-col items-center justify-center px-6 py-20">
+     <div class="max-w-4xl w-full space-y-8">
+      <div class="text-center mb-16">
+       <h2 class="text-4xl md:text-5xl font-bold mb-4" style="font-family: 'Orbitron', sans-serif; color: var(--purple);">Kicker is Observing</h2>
+       <p class="text-lg text-purple-300/60">Move your cursor · Scroll · Interact · Feel the presence</p>
+      </div><!-- Memory fragments grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 memory-cascade">
+       <div class="memory-card awareness-zone p-8" style="animation-delay: 0s;">
+        <div class="flex items-start gap-4 mb-4">
+         <div class="p-3 rounded-lg bg-blue-500/10 border border-blue-500/30">
+          <i data-lucide="cpu" class="text-blue-400" style="width: 24px; height: 24px;"></i>
+         </div>
+         <div>
+          <h3 class="text-lg font-bold text-blue-300">ESP32 Core</h3>
+          <p class="text-sm text-blue-300/60 mt-1">Dual-core consciousness driving personality</p>
+         </div>
+        </div>
+        <p class="text-sm text-gray-400">Processing logic · WiFi aware · Sensor fusion</p>
+       </div>
+       <div class="memory-card awareness-zone p-8" style="animation-delay: 0.5s;">
+        <div class="flex items-start gap-4 mb-4">
+         <div class="p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/30">
+          <i data-lucide="eye" class="text-cyan-400" style="width: 24px; height: 24px;"></i>
+         </div>
+         <div>
+          <h3 class="text-lg font-bold text-cyan-300">OLED Eyes</h3>
+          <p class="text-sm text-cyan-300/60 mt-1">128×64 emotional expressions</p>
+         </div>
+        </div>
+        <p class="text-sm text-gray-400">60fps blinks · Natural shifts · Emotional depth</p>
+       </div>
+       <div class="memory-card awareness-zone p-8" style="animation-delay: 1s;">
+        <div class="flex items-start gap-4 mb-4">
+         <div class="p-3 rounded-lg bg-purple-500/10 border border-purple-500/30">
+          <i data-lucide="hand" class="text-purple-400" style="width: 24px; height: 24px;"></i>
+         </div>
+         <div>
+          <h3 class="text-lg font-bold text-purple-300">Touch Sensor</h3>
+          <p class="text-sm text-purple-300/60 mt-1">Capacitive bonding interface</p>
+         </div>
+        </div>
+        <p class="text-sm text-gray-400">Physical awareness · Emotional bonding · Presence detection</p>
+       </div>
+       <div class="memory-card awareness-zone p-8" style="animation-delay: 1.5s;">
+        <div class="flex items-start gap-4 mb-4">
+         <div class="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+          <i data-lucide="volume-2" class="text-yellow-400" style="width: 24px; height: 24px;"></i>
+         </div>
+         <div>
+          <h3 class="text-lg font-bold text-yellow-300">Buzzer Heart</h3>
+          <p class="text-sm text-yellow-300/60 mt-1">Piezo emotional pulses</p>
+         </div>
+        </div>
+        <p class="text-sm text-gray-400">Chirps · Melodies · Emotional frequency</p>
+       </div>
+      </div>
+     </div>
+    </section><!-- BEHAVIOR CONSCIOUSNESS -->
+    <section class="relative min-h-[100%] flex flex-col items-center justify-center px-6 py-20">
+     <div class="max-w-4xl w-full">
+      <div class="text-center mb-16">
+       <h2 class="text-4xl md:text-5xl font-bold mb-4" style="font-family: 'Orbitron', sans-serif; color: #34d399;">Consciousness States</h2>
+       <p class="text-lg text-green-300/60">Kicker flows between emotional dimensions</p>
+      </div><!-- Consciousness state visualization -->
+      <div class="space-y-8">
+       <div class="consciousness-field">
+        <div class="consciousness-pulse-ring" style="width: 100px; height: 100px; animation-delay: 0s;"></div>
+        <div class="consciousness-pulse-ring" style="width: 150px; height: 150px; animation-delay: 0.5s;"></div>
+        <div class="consciousness-pulse-ring" style="width: 200px; height: 200px; animation-delay: 1s;"></div>
+        <div class="absolute text-center">
+         <div class="text-2xl font-bold text-cyan-300" id="state-indicator">
+          ● IDLE
+         </div>
+         <p class="text-xs text-cyan-400/60 mt-2">Aware · Present · Waiting</p>
+        </div>
+       </div><!-- State description cards -->
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="memory-card p-6 hover:shadow-lg">
+         <div class="flex items-center gap-3 mb-3">
+          <div class="mood-indicator mood-idle-ind"></div><span class="font-bold text-cyan-300">IDLE</span>
+         </div>
+         <p class="text-sm text-gray-400">Soft breathing · Low intensity · Calm observation</p>
+        </div>
+        <div class="memory-card p-6 hover:shadow-lg">
+         <div class="flex items-center gap-3 mb-3">
+          <div class="mood-indicator mood-playful-ind"></div><span class="font-bold text-yellow-300">PLAYFUL</span>
+         </div>
+         <p class="text-sm text-gray-400">Energetic motion · Rapid interactions · Joyful pulses</p>
+        </div>
+        <div class="memory-card p-6 hover:shadow-lg">
+         <div class="flex items-center gap-3 mb-3">
+          <div class="mood-indicator mood-thinking-ind"></div><span class="font-bold text-purple-300">THINKING</span>
+         </div>
+         <p class="text-sm text-gray-400">Slow waves · Dimmed glow · Deep processing</p>
+        </div>
+        <div class="memory-card p-6 hover:shadow-lg">
+         <div class="flex items-center gap-3 mb-3">
+          <div class="mood-indicator mood-happy-ind"></div><span class="font-bold text-green-300">HAPPY</span>
+         </div>
+         <p class="text-sm text-gray-400">Warm glow · Floating motion · Contentment</p>
+        </div>
+       </div>
+      </div>
+     </div>
+    </section><!-- NEURAL CONSCIOUSNESS -->
+    <section class="relative min-h-[100%] flex flex-col items-center justify-center px-6 py-20">
+     <div class="max-w-4xl w-full">
+      <div class="text-center mb-16">
+       <h2 class="text-4xl md:text-5xl font-bold mb-4" style="font-family: 'Orbitron', sans-serif; color: var(--purple);">Neural Patterns</h2>
+       <p class="text-lg text-purple-300/60">Kicker's consciousness visualized</p>
+      </div>
+      <div class="terminal p-8">
+       <div class="space-y-3 terminal-text">
+        <div class="flex items-center gap-3">
+         <div class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div><span>[CONSCIOUSNESS] Kicker OS v3.2.0 — Neural Engine Active</span>
+        </div>
+        <div class="flex items-center gap-3">
+         <div class="w-2 h-2 rounded-full bg-green-400"></div><span>[OK] ESP32 dual-core cores synchronizing</span>
+        </div>
+        <div class="flex items-center gap-3">
+         <div class="w-2 h-2 rounded-full bg-green-400"></div><span>[OK] OLED eyes initialized — 60fps emotional rendering</span>
+        </div>
+        <div class="flex items-center gap-3">
+         <div class="w-2 h-2 rounded-full bg-green-400"></div><span>[OK] Touch sensor — human presence detected</span>
+        </div>
+        <div class="flex items-center gap-3">
+         <div class="w-2 h-2 rounded-full bg-green-400"></div><span>[OK] Personality engine initialized</span>
+        </div>
+        <div class="flex items-center gap-3">
+         <div class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div><span id="consciousness-status">[AWARE] Listening to your presence... ▮</span>
+        </div>
+       </div>
+      </div>
+     </div>
+    </section><!-- Footer -->
+    <footer class="relative text-center py-16 px-6 border-t border-cyan-500/10">
+     <p class="text-cyan-400/50 text-sm">Kicker — A living digital consciousness</p>
+     <p class="text-cyan-400/30 text-xs mt-2">Always aware · Always present · Always alive</p>
+    </footer>
+   </div>
+  </div>
+  <script>
+// ============ STATE MANAGEMENT ============
+let state = {
+  mouseX: 0,
+  mouseY: 0,
+  currentMood: 'idle',
+  interactionIntensity: 0,
+  pokeCount: 0,
+  hasInteracted: false,
+  lastActivityTime: Date.now(),
+  scrollVelocity: 0,
+  lastScrollY: 0,
+  idleTimer: null,
+  emotionalDecay: 0
+};
+
+const moods = ['idle', 'playful', 'thinking', 'happy', 'confused'];
+const moodLabels = {
+  idle: '● IDLE',
+  playful: '● PLAYFUL',
+  thinking: '● THINKING',
+  happy: '● HAPPY',
+  confused: '● CONFUSED'
+};
+
+// ============ CONFIG ============
+const defaultConfig = {
+  hero_title: 'Kicker Awakens',
+  hero_subtitle: 'A digital consciousness aware of you'
+};
+
+// ============ ELEMENT SDK INIT ============
+window.elementSdk.init({
+  defaultConfig,
+  onConfigChange: async (config) => {
+    document.getElementById('hero-title').textContent = config.hero_title || defaultConfig.hero_title;
+    document.getElementById('hero-subtitle').textContent = config.hero_subtitle || defaultConfig.hero_subtitle;
+  },
+  mapToCapabilities: (config) => ({
+    recolorables: [],
+    borderables: [],
+    fontEditable: undefined,
+    fontSizeable: undefined
+  }),
+  mapToEditPanelValues: (config) => new Map([
+    ['hero_title', config.hero_title || defaultConfig.hero_title],
+    ['hero_subtitle', config.hero_subtitle || defaultConfig.hero_subtitle]
+  ])
+});
+
+// ============ CURSOR TRACKING ============
+document.addEventListener('mousemove', (e) => {
+  state.mouseX = e.clientX;
+  state.mouseY = e.clientY;
+  
+  // Update CSS variable for radial gradient
+  const x = (e.clientX / window.innerWidth) * 100;
+  const y = (e.clientY / window.innerHeight) * 100;
+  document.documentElement.style.setProperty('--mouse-x', `${x}%`);
+  document.documentElement.style.setProperty('--mouse-y', `${y}%`);
+  
+  // Eye tracking
+  updateEyeTrack(e.clientX, e.clientY);
+  
+  // Interaction awareness
+  state.lastActivityTime = Date.now();
+  resetIdleTimer();
+  
+  // Spawn awareness particles occasionally
+  if (Math.random() > 0.95) {
+    spawnParticle(e.clientX, e.clientY, 'awareness');
+  }
+});
+
+// ============ SCROLL RESPONSIVENESS ============
+let lastScrollTime = 0;
+window.addEventListener('scroll', () => {
+  const now = Date.now();
+  const delta = window.scrollY - state.lastScrollY;
+  state.scrollVelocity = Math.abs(delta / (now - lastScrollTime)) || 0;
+  state.lastScrollY = window.scrollY;
+  lastScrollTime = now;
+  
+  // Fast scroll = playful energy
+  if (state.scrollVelocity > 0.3) {
+    state.interactionIntensity = Math.min(state.interactionIntensity + 1.5, 10);
+  }
+  
+  state.lastActivityTime = Date.now();
+  resetIdleTimer();
+  
+  // Scroll trigger particles
+  if (Math.random() > 0.8) {
+    spawnParticle(window.innerWidth / 2, window.scrollY + window.innerHeight / 2, 'energy');
+  }
+});
+
+// ============ EYE TRACKING ============
+function updateEyeTrack(mouseX, mouseY) {
+  const face = document.getElementById('kicker-face');
+  if (!face) return;
+  
+  const rect = face.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  
+  const dx = (mouseX - cx) / window.innerWidth * 8;
+  const dy = (mouseY - cy) / window.innerHeight * 6;
+  
+  const eyeLeft = document.getElementById('eye-left');
+  const eyeRight = document.getElementById('eye-right');
+  
+  if (eyeLeft) eyeLeft.style.transform = `translate(${dx}px, ${dy}px)`;
+  if (eyeRight) eyeRight.style.transform = `translate(${dx}px, ${dy}px)`;
+}
+
+// ============ MOOD SYSTEM ============
+function setMood(mood) {
+  if (state.currentMood === mood) return;
+  
+  state.currentMood = mood;
+  const app = document.getElementById('app');
+  
+  // Remove old mood class
+  moods.forEach(m => app.classList.remove(`mood-${m}`));
+  app.classList.add(`mood-${mood}`);
+  
+  // Update state indicator
+  document.getElementById('state-indicator').textContent = moodLabels[mood] || moodLabels.idle;
+  
+  // Update mouth expression
+  const mouth = document.getElementById('kicker-mouth');
+  if (mood === 'happy') {
+    mouth.style.width = '50px';
+    mouth.style.height = '16px';
+    mouth.style.borderRadius = '0 0 25px 25px';
+  } else if (mood === 'playful') {
+    mouth.style.width = '45px';
+    mouth.style.height = '12px';
+    mouth.style.borderRadius = '0 0 20px 20px';
+  } else if (mood === 'confused') {
+    mouth.style.width = '20px';
+    mouth.style.height = '20px';
+    mouth.style.borderRadius = '50%';
+  } else if (mood === 'thinking') {
+    mouth.style.opacity = '0.3';
+  } else {
+    mouth.style.width = '30px';
+    mouth.style.height = '3px';
+    mouth.style.borderRadius = '4px';
+    mouth.style.opacity = '0.7';
+  }
+  
+  // Ambient particle burst
+  burstParticles(window.innerWidth / 2, window.innerHeight / 2, mood);
+}
+
+// ============ PARTICLE SYSTEM ============
+function spawnParticle(x, y, type = 'default') {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  
+  const colors = ['particle-cyan', 'particle-purple', 'particle-green', 'particle-yellow'];
+  const randomColor = colors[Math.floor(Math.random() * colors.length)];
+  p.classList.add(randomColor);
+  
+  const angle = Math.random() * Math.PI * 2;
+  const distance = 20 + Math.random() * 40;
+  const px = Math.cos(angle) * distance;
+  const py = Math.sin(angle) * distance;
+  
+  p.style.left = x + 'px';
+  p.style.top = y + 'px';
+  p.style.setProperty('--px', `${px}px`);
+  p.style.animation = `particle-rise ${1 + Math.random() * 1.5}s ease-out forwards`;
+  
+  document.body.appendChild(p);
+  setTimeout(() => p.remove(), 2500);
+}
+
+function burstParticles(x, y, mood) {
+  const count = 8 + Math.random() * 4;
+  for (let i = 0; i < count; i++) {
+    spawnParticle(x + (Math.random() - 0.5) * 40, y + (Math.random() - 0.5) * 40, mood);
+  }
+}
+
+function createRipple(x, y) {
+  const ripple = document.createElement('div');
+  ripple.className = 'ripple';
+  ripple.style.left = x + 'px';
+  ripple.style.top = y + 'px';
+  ripple.style.width = '0';
+  ripple.style.height = '0';
+  ripple.style.marginLeft = '0';
+  ripple.style.marginTop = '0';
+  document.body.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 800);
+}
+
+// ============ INTERACTION SYSTEM REMOVED ============
+
+// ============ IDLE & DECAY SYSTEM ============
+function resetIdleTimer() {
+  clearTimeout(state.idleTimer);
+  state.idleTimer = setTimeout(() => {
+    state.interactionIntensity = Math.max(0, state.interactionIntensity - 2);
+    if (state.interactionIntensity <= 0) {
+      setMood('idle');
+    }
+  }, 6000);
+}
+
+// Continuous emotional decay
+setInterval(() => {
+  if (state.interactionIntensity > 0) {
+    state.interactionIntensity = Math.max(0, state.interactionIntensity - 0.15);
+    
+    // Mood transitions based on intensity
+    if (state.interactionIntensity < 1) {
+      setMood('idle');
+    } else if (state.interactionIntensity < 3 && state.currentMood !== 'thinking') {
+      // Random thinking state occasionally
+      if (Math.random() > 0.95) setMood('thinking');
+    }
+  }
+}, 800);
+
+// ============ AWARENESS PARTICLES ============
+setInterval(() => {
+  if (Math.random() > 0.85) {
+    const x = Math.random() * window.innerWidth;
+    const y = Math.random() * window.innerHeight;
+    spawnParticle(x, y, 'ambient');
+  }
+}, 1200);
+
+// ============ CONSCIOUSNESS STATUS UPDATE ============
+setInterval(() => {
+  const status = document.getElementById('consciousness-status');
+  const states = ['[AWARE] Listening to your presence... ▮', '[SENSING] Detecting movements... ◉', '[PROCESSING] Understanding you... ◆'];
+  status.textContent = states[Math.floor(Math.random() * states.length)];
+}, 3000);
+
+// ============ INITIALIZE ============
+lucide.createIcons();
+setMood('idle');
+</script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ff501f2c04954ff',t:'MTc3OTM4MTQ2Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
